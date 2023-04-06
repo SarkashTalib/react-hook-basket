@@ -16,7 +16,25 @@ function App() {
   const [basket, setBasket] = useState([]);
 
   const addToBasket = (item) => {
-    setBasket((prevBasket) => [...prevBasket, item]);
+    // setBasket((prevBasket) => [...prevBasket, item]);
+    setBasket((prevBasket) => {
+      const itemIndex = prevBasket.findIndex((i) => i.id === item.id);
+
+      if (itemIndex !== -1) {
+        // this is where dup exists
+        const newBasket = [...prevBasket]
+        newBasket[itemIndex] = {
+          ...newBasket[itemIndex],
+          qty: newBasket[itemIndex].qty + 1,
+        }
+        return newBasket;
+      } else {
+        return [...prevBasket, { ...item, qty: 1 }]
+      }
+    })
+    // check if id already exists
+
+    // get the existing record that matches the id
   };
 
   const clearBasket = () => {
@@ -24,8 +42,31 @@ function App() {
   };
 
   const removeItem = (id) => {
-    setBasket((prevBasket) => prevBasket.filter((item) => item.id !== id))
-  };
+    setBasket((prevBasket) =>
+      prevBasket.reduce((acc, item) => {
+        if (item.id === id) {
+          if (item.qty > 1) {
+            acc.push({ ...item, qty: item.qty - 1 });
+          }
+        } else {
+          acc.push(item)
+        }
+        return acc;
+      }, [])
+    );
+  }
+
+  // const removeItem = (id) => {
+  //   setBasket((prevBasket) =>
+  //     prevBasket.map((item) => {
+  //       if (item.id === id && item.qty > 0) {
+  //         return { ...item, qty: item.qty - 1 }
+  //       }
+  //       return item;
+  //     })
+  //       .filter((item) => item.qty !== 0)
+  //   );
+  // };
 
   return (
     <div className="App">
